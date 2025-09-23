@@ -26,9 +26,14 @@ spring:
           max-wait: -1ms
           max-idle: 8
           min-idle: 0
+  ai:
+    openai:
+      api-key: ${BL_API_KEY}
+      base-url: https://dashscope.aliyuncs.com/compatible-mode
+      chat:
+        options:
+          model: deepseek-v3
+
+
 server:
   port: 8090
-
-ai :
-  key : sk-90e295249b264fbe9e2dfe9d84dc06dd
-  base-url: ""
