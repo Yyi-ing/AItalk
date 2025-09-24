@@ -1,5 +1,5 @@
 <script setup>
-import { ref } from 'vue'
+import { ref, onMounted, onBeforeUnmount } from 'vue'
 import { chat as chatApi } from '@/services/api'
 
 const messages = ref([
@@ -9,22 +9,91 @@ const userInput = ref('')
 const isSending = ref(false)
 const errorText = ref('')
 
-async function sendMessage() {
-  const content = userInput.value.trim()
-  if (!content || isSending.value) return
-  errorText.value = ''
+// Speech recognition state
+const supportsSpeech = ref(false)
+const isRecording = ref(false)
+let recognition = null
+const recognizedBuffer = ref('')
 
-  messages.value.push({ role: 'user', content })
-  userInput.value = ''
+onMounted(() => {
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition
+  if (SR) {
+    supportsSpeech.value = true
+    recognition = new SR()
+    recognition.lang = 'zh-CN'
+    recognition.interimResults = true
+    recognition.continuous = true
+
+    recognition.onresult = (event) => {
+      for (let i = event.resultIndex; i < event.results.length; i++) {
+        const res = event.results[i]
+        if (res.isFinal) {
+          recognizedBuffer.value += res[0].transcript
+        }
+        // 不显示中间结果或最终文本到输入框
+      }
+    }
+
+    recognition.onerror = (e) => {
+      isRecording.value = false
+      errorText.value = `语音识别出错: ${e.error || '未知错误'}`
+    }
+
+    recognition.onend = async () => {
+      isRecording.value = false
+      const text = recognizedBuffer.value.trim()
+      recognizedBuffer.value = ''
+      if (text) {
+        await sendContent(text)
+      }
+    }
+  }
+})
+
+onBeforeUnmount(() => {
+  try {
+    if (recognition && isRecording.value) recognition.stop()
+  } catch {}
+})
+
+function toggleRecord() {
+  if (!supportsSpeech.value || !recognition) return
+  errorText.value = ''
+  try {
+    if (!isRecording.value) {
+      recognizedBuffer.value = ''
+      recognition.start()
+      isRecording.value = true
+    } else {
+      recognition.stop()
+    }
+  } catch (e) {
+    errorText.value = '无法启动语音识别（浏览器权限或环境限制）'
+    isRecording.value = false
+  }
+}
+
+async function sendContent(content) {
+  const text = content.trim()
+  if (!text || isSending.value) return
+  errorText.value = ''
+  messages.value.push({ role: 'user', content: text })
   isSending.value = true
   try {
-    const reply = await chatApi(content)
+    const reply = await chatApi(text)
     messages.value.push({ role: 'assistant', content: reply })
   } catch (err) {
     errorText.value = err.message || '发送失败'
   } finally {
     isSending.value = false
   }
+}
+
+async function sendMessage() {
+  const content = userInput.value.trim()
+  if (!content) return
+  userInput.value = ''
+  await sendContent(content)
 }
 </script>
 
@@ -40,9 +109,18 @@ async function sendMessage() {
       <input
         v-model="userInput"
         type="text"
-        placeholder="输入你的问题..."
+        placeholder="输入你的问题...（也可点击麦克风语音发送）"
         :disabled="isSending"
       />
+      <button
+        type="button"
+        class="mic"
+        :title="supportsSpeech ? (isRecording ? '停止录音' : '开始录音') : '浏览器不支持语音识别'"
+        :disabled="!supportsSpeech || isSending"
+        @click="toggleRecord"
+      >
+        {{ isRecording ? '停止' : '🎤' }}
+      </button>
       <button type="submit" :disabled="isSending || !userInput.trim()">
         {{ isSending ? '发送中...' : '发送' }}
       </button>
@@ -113,6 +191,10 @@ async function sendMessage() {
   color: white;
   border-radius: 8px;
   cursor: pointer;
+}
+.input .mic {
+  padding: 0 12px;
+  background: #ef4444;
 }
 .input button[disabled] {
   opacity: 0.6;

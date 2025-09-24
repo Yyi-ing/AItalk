@@ -2,9 +2,13 @@ package com.yyxxlu.aitalk.controller;
 
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
+import java.util.Map;
 
 @RestController
 public class aiController {
@@ -18,6 +22,15 @@ public class aiController {
                 .user(prompt)
                 .call()
                 .content();
+    }
+
+    @PostMapping(value = "/record", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<Map<String, Object>> chatWithVoice(
+            @RequestParam("file") MultipartFile file) throws IOException {
+
+
+
+        return null;
     }
 
 
