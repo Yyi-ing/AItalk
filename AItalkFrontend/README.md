@@ -1,29 +1,22 @@
-# untitled
+# AItalkFrontend
 
-This template should help get you started developing with Vue 3 in Vite.
+A simple Vue 3 + Vite frontend for the AItalk chat backend.
 
-## Recommended IDE Setup
+## Prerequisites
+- Node.js 20+
+- Backend Spring Boot running on http://localhost:8090 with GET /chat?prompt=...
 
-[VSCode](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur).
-
-## Customize configuration
-
-See [Vite Configuration Reference](https://vite.dev/config/).
-
-## Project Setup
-
+## Development
 ```sh
 npm install
-```
-
-### Compile and Hot-Reload for Development
-
-```sh
 npm run dev
 ```
+The dev server proxies API requests from `/api/*` to `http://localhost:8090`.
 
-### Compile and Minify for Production
+Example: frontend calls `/api/chat?prompt=hello` → backend `/chat?prompt=hello`.
 
+## Build
 ```sh
 npm run build
+npm run preview
 ```

@@ -1,47 +1,28 @@
 <script setup>
-import HelloWorld from './components/HelloWorld.vue'
-import TheWelcome from './components/TheWelcome.vue'
+import Chat from './components/Chat.vue'
 </script>
 
 <template>
   <header>
-    <img alt="Vue logo" class="logo" src="./assets/logo.svg" width="125" height="125" />
-
-    <div class="wrapper">
-      <HelloWorld msg="You did it!" />
-    </div>
+    <h1>AItalk</h1>
   </header>
-
   <main>
-    <TheWelcome />
+    <Chat />
   </main>
 </template>
 
 <style scoped>
 header {
-  line-height: 1.5;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  justify-content: center;
+  padding: 16px 0;
 }
-
 .logo {
   display: block;
-  margin: 0 auto 2rem;
 }
-
-@media (min-width: 1024px) {
-  header {
-    display: flex;
-    place-items: center;
-    padding-right: calc(var(--section-gap) / 2);
-  }
-
-  .logo {
-    margin: 0 2rem 0 0;
-  }
-
-  header .wrapper {
-    display: flex;
-    place-items: flex-start;
-    flex-wrap: wrap;
-  }
+main {
+  padding: 0 16px 24px;
 }
 </style>
