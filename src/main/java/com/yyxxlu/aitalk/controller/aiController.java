@@ -1,20 +1,23 @@
 package com.yyxxlu.aitalk.controller;
 
+import com.yyxxlu.aitalk.service.VoiceService;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
-import java.util.Map;
+import java.nio.ByteBuffer;
 
 @RestController
 public class aiController {
 
     @Autowired
     private ChatClient chatClient;
+
+    @Autowired
+    private VoiceService voiceService;
 
     @GetMapping("/chat")
     public String chat(String prompt) {
@@ -24,13 +27,23 @@ public class aiController {
                 .content();
     }
 
-    @PostMapping(value = "/record", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<Map<String, Object>> chatWithVoice(
-            @RequestParam("file") MultipartFile file) throws IOException {
 
 
 
-        return null;
+    @GetMapping(value = "/voice")
+    public ResponseEntity<byte []> chatWithVoice(@RequestParam("prompt") String prompt)  {
+        ByteBuffer voice = voiceService.getVoice(chatClient.prompt()
+                .user(prompt)
+                .call()
+                .content());
+
+        byte[] bytes = new byte[voice.remaining()];
+        voice.get(bytes);
+
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=\"voice.mp3\"")
+                .contentType(MediaType.parseMediaType("audio/mpeg"))
+                .body(bytes);
     }
 
 

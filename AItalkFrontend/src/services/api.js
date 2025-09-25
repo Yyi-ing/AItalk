@@ -7,3 +7,17 @@ export async function chat(prompt) {
   }
   return await response.text()
 }
+
+export async function chatAudio(prompt) {
+  const params = new URLSearchParams({ prompt })
+  const response = await fetch(`/api/voice?${params.toString()}`, {
+    headers: {
+      Accept: 'audio/*'
+    }
+  })
+  if (!response.ok) {
+    const text = await response.text().catch(() => '')
+    throw new Error(`Audio request failed: ${response.status} ${text}`)
+  }
+  return await response.blob()
+}

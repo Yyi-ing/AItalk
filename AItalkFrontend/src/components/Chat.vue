@@ -1,6 +1,6 @@
 <script setup>
 import { ref, onMounted, onBeforeUnmount } from 'vue'
-import { chat as chatApi } from '@/services/api'
+import { chat as chatApi, chatAudio as chatAudioApi } from '@/services/api'
 
 const messages = ref([
   { role: 'assistant', content: '你好，我是你的AI助手。有什么可以帮你？' }
@@ -30,7 +30,6 @@ onMounted(() => {
         if (res.isFinal) {
           recognizedBuffer.value += res[0].transcript
         }
-        // 不显示中间结果或最终文本到输入框
       }
     }
 
@@ -73,6 +72,15 @@ function toggleRecord() {
   }
 }
 
+async function playAudioBlob(blob) {
+  const url = URL.createObjectURL(blob)
+  try {
+    const audio = new Audio(url)
+    await audio.play()
+  } catch {}
+  return url
+}
+
 async function sendContent(content) {
   const text = content.trim()
   if (!text || isSending.value) return
@@ -80,10 +88,18 @@ async function sendContent(content) {
   messages.value.push({ role: 'user', content: text })
   isSending.value = true
   try {
-    const reply = await chatApi(text)
-    messages.value.push({ role: 'assistant', content: reply })
+    // 优先请求后端返回音频
+    const audioBlob = await chatAudioApi(text)
+    const audioUrl = await playAudioBlob(audioBlob)
+    messages.value.push({ role: 'assistant', content: '语音回复', audioUrl })
   } catch (err) {
-    errorText.value = err.message || '发送失败'
+    // 回退：若音频失败，尝试文字接口
+    try {
+      const reply = await chatApi(text)
+      messages.value.push({ role: 'assistant', content: reply })
+    } catch (e2) {
+      errorText.value = err?.message || e2?.message || '发送失败'
+    }
   } finally {
     isSending.value = false
   }
@@ -101,7 +117,15 @@ async function sendMessage() {
   <div class="chat">
     <div class="messages" ref="list">
       <div v-for="(m, idx) in messages" :key="idx" class="message" :class="m.role">
-        <div class="bubble">{{ m.content }}</div>
+        <div class="bubble">
+          <template v-if="m.audioUrl">
+            🔊 {{ m.content }}
+            <audio :src="m.audioUrl" controls style="display:block; margin-top:6px; width:100%"></audio>
+          </template>
+          <template v-else>
+            {{ m.content }}
+          </template>
+        </div>
       </div>
     </div>
     <div class="error" v-if="errorText">{{ errorText }}</div>
@@ -119,7 +143,7 @@ async function sendMessage() {
         :disabled="!supportsSpeech || isSending"
         @click="toggleRecord"
       >
-        {{ isRecording ? '停止' : '🎤' }}
+        {{ isRecording ? '停止' : '录音' }}
       </button>
       <button type="submit" :disabled="isSending || !userInput.trim()">
         {{ isSending ? '发送中...' : '发送' }}
