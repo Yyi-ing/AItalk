@@ -1,6 +1,7 @@
 package com.yyxxlu.aitalk.config;
 
 import org.springframework.ai.chat.client.ChatClient;
+import org.springframework.ai.chat.client.advisor.SimpleLoggerAdvisor;
 import org.springframework.ai.openai.OpenAiChatModel;
 import org.springframework.ai.openai.OpenAiChatOptions;
 import org.springframework.ai.openai.api.OpenAiApi;
@@ -13,6 +14,8 @@ public class aiConfig {
 
     @Bean
     public ChatClient chatClient(OpenAiChatModel model) {
-        return ChatClient.builder(model).build();
+        return ChatClient.builder(model)
+                .defaultAdvisors(new SimpleLoggerAdvisor())
+                .build();
     }
 }

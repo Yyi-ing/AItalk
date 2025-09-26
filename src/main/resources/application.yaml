@@ -40,3 +40,9 @@ server:
 
 ai:
   apikey: ${BL_API_KEY}
+
+
+logging:
+  level:
+    org.springframework.ai.chat.client.advisor: debug
+    com.yyxxlu.aitalk: debug

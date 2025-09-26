@@ -10,7 +10,6 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.Arrays;
 
 @SpringBootTest
 class AiTalkApplicationTests {
@@ -37,7 +36,7 @@ class AiTalkApplicationTests {
     @Test
     void testV() throws IOException {
         // 保存为MP3文件进行验证
-        ByteBuffer buffer = voiceService.getVoice("今天天气怎么样？");
+        ByteBuffer buffer = voiceService.getAudio("今天天气怎么样？");
         byte[] audioData = new byte[buffer.remaining()];
         buffer.get(audioData);
 

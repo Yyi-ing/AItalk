@@ -29,10 +29,10 @@ public class aiController {
 
 
 
-
-    @GetMapping(value = "/voice")
+    //没有角色功能的接口
+//    @GetMapping(value = "/voice")
     public ResponseEntity<byte []> chatWithVoice(@RequestParam("prompt") String prompt)  {
-        ByteBuffer voice = voiceService.getVoice(chatClient.prompt()
+        ByteBuffer voice = voiceService.getAudio(chatClient.prompt()
                 .user(prompt)
                 .call()
                 .content());
@@ -45,6 +45,22 @@ public class aiController {
                 .contentType(MediaType.parseMediaType("audio/mpeg"))
                 .body(bytes);
     }
+
+    @GetMapping(value = "/voice")
+    public ResponseEntity<byte []> chatWithRole(@RequestParam("prompt") String prompt)  {
+        ByteBuffer voice = voiceService.getAudioOptimize(prompt);
+
+        byte[] bytes = new byte[voice.remaining()];
+        voice.get(bytes);
+
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=\"voice.mp3\"")
+                .contentType(MediaType.parseMediaType("audio/mpeg"))
+                .body(bytes);
+    }
+
+
+
 
 
 }
