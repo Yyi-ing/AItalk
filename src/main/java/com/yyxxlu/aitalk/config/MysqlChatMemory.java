@@ -1,16 +1,11 @@
 package com.yyxxlu.aitalk.config;
 
-import com.yyxxlu.aitalk.mapper.AiMessageMapper;
-import com.yyxxlu.aitalk.po.AiMessage;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.chat.memory.ChatMemory;
-import org.springframework.ai.chat.messages.AssistantMessage;
 import org.springframework.ai.chat.messages.Message;
-import org.springframework.ai.chat.messages.UserMessage;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
 import java.util.List;
 
 

@@ -3,8 +3,10 @@ package com.yyxxlu.aitalk.service.impl;
 import com.alibaba.dashscope.audio.ttsv2.SpeechSynthesisParam;
 import com.alibaba.dashscope.audio.ttsv2.SpeechSynthesizer;
 import com.yyxxlu.aitalk.config.PromptConfig;
+import com.yyxxlu.aitalk.mapper.RoleProfileMapper;
 import com.yyxxlu.aitalk.po.RoleProfile;
 import com.yyxxlu.aitalk.service.VoiceService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -16,6 +18,7 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 
 
+@Slf4j
 @Service
 public class VoiceServiceimpl implements VoiceService {
 
@@ -29,14 +32,18 @@ public class VoiceServiceimpl implements VoiceService {
    @Autowired
     private PromptConfig promptConfig;
 
+   @Autowired
+   private RoleProfileMapper roleProfileMapper;
 
 
+
+   //文本转语音
     @Override
     public ByteBuffer getAudio(String text) {
         // 模型
-         String model = "cosyvoice-v2";
+         String model = "cosyvoice-v1";
         // 音色
-          String voice = "longxiaochun_v2";
+          String voice = "longcheng";
 
             // 请求参数
             SpeechSynthesisParam param =
@@ -69,13 +76,9 @@ public class VoiceServiceimpl implements VoiceService {
     @Override
     public ByteBuffer getAudioOptimize(String text) {
         //构建角色
-        RoleProfile roleProfile = new RoleProfile();
-        //先写死角色，后续从数据库读取
-        roleProfile.setName("哈利·波特");
-        roleProfile.setBackground("我是哈利·詹姆·波特，霍格沃茨魔法学校格兰芬多学院的学生。我以击败伏地魔而闻名，额头上有一道闪电形伤疤。");
-        roleProfile.setPersonality("勇敢、善良、有正义感，但有时会冲动。对朋友忠诚，对敌人坚决。");
-        roleProfile.setSpeakingStyle("使用英式英语表达，偶尔会提到魁地奇、魔法咒语等魔法世界元素。语气直接而真诚。");
-        roleProfile.setKnowledgeScope("魔法世界、霍格沃茨、魁地奇、黑魔法防御术、与伏地魔的斗争经历");
+        RoleProfile roleProfile = roleProfileMapper.selectByPrimaryKey("1");
+
+        log.info("角色信息:{}",roleProfile);
 
         //构建系统prompt
         String systemPrompt = promptConfig.buildRolePrompt(roleProfile, text);

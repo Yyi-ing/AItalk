@@ -3,9 +3,12 @@ spring:
     name: aiTalk
     version: 1.0.0
   datasource:
-    url: jdbc:mysql://14.103.183.242:3366/qN?useSSL=false&serverTimezone=Asia/Shanghai&characterEncoding=utf8&allowPublicKeyRetrieval=true
-    username: admin
-    password: admin
+#    url: jdbc:mysql://14.103.183.242:3366/qN?useSSL=false&serverTimezone=Asia/Shanghai&characterEncoding=utf8&allowPublicKeyRetrieval=true
+#    username: admin
+#    password: admin
+    url: jdbc:mysql://127.0.0.1:3306/aitalk?useSSL=false&serverTimezone=Asia/Shanghai&characterEncoding=utf8&allowPublicKeyRetrieval=true
+    username: root
+    password: 123456
     driver-class-name: com.mysql.cj.jdbc.Driver
     hikari:
       pool-name: HikariPool

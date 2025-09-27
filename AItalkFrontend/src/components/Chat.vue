@@ -160,7 +160,7 @@ async function sendMessage() {
   display: flex;
   flex-direction: column;
   gap: 12px;
-  max-height: 80vh;
+  max-height: 600px;
 }
 .messages {
   display: flex;
