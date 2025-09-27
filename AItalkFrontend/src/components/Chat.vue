@@ -133,7 +133,7 @@ async function sendMessage() {
       <input
         v-model="userInput"
         type="text"
-        placeholder="输入你的问题...（也可点击麦克风语音发送）"
+        placeholder="请输入文本...（也可点击麦克风语音发送）"
         :disabled="isSending"
       />
       <button
@@ -160,6 +160,7 @@ async function sendMessage() {
   display: flex;
   flex-direction: column;
   gap: 12px;
+  max-height: 80vh;
 }
 .messages {
   display: flex;
