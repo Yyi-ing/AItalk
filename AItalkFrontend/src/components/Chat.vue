@@ -1,13 +1,21 @@
 <script setup>
-import { ref, onMounted, onBeforeUnmount } from 'vue'
-import { chat as chatApi, chatAudio as chatAudioApi } from '@/services/api'
+import { ref, onMounted, onBeforeUnmount, watch } from 'vue'
+import { chat as chatApi, chatAudio as chatAudioApi, getHistory } from '@/services/api'
+
+const props = defineProps({
+  selectedRole: {
+    type: Object,
+    default: null
+  }
+})
 
 const messages = ref([
-  { role: 'assistant', content: '你好，我是你的AI助手。有什么可以帮你？' }
+  { role: 'assistant', content: '请在左侧角色列表选择AI的扮演角色，并开始对话' }
 ])
 const userInput = ref('')
 const isSending = ref(false)
 const errorText = ref('')
+const isLoadingHistory = ref(false)
 
 // Speech recognition state
 const supportsSpeech = ref(false)
@@ -81,25 +89,65 @@ async function playAudioBlob(blob) {
   return url
 }
 
+// Watch for role changes from parent
+watch(() => props.selectedRole, async (newRole) => {
+  if (newRole) {
+    isLoadingHistory.value = true
+    try {
+      // 获取该角色的聊天历史
+      const history = await getHistory(newRole.id)
+      if (history && history.length > 0) {
+        // 如果有历史记录，显示历史记录
+        messages.value = history.map(msg => ({
+          role: msg.role,
+          content: msg.content,
+          audioUrl: null // 历史记录不包含音频
+        }))
+      } else {
+        // 如果没有历史记录，显示角色介绍
+        messages.value = [
+          { role: 'assistant', content: `你好！我是${newRole.name}` }
+        ]
+      }
+    } catch (err) {
+      console.error('获取聊天历史失败:', err)
+      // 如果获取历史失败，显示角色介绍
+      messages.value = [
+        { role: 'assistant', content: `你好！我是${newRole.name}` }
+      ]
+    } finally {
+      isLoadingHistory.value = false
+    }
+  } else {
+    messages.value = [
+      { role: 'assistant', content: '请在左侧角色列表选择AI的扮演角色，并开始对话' }
+    ]
+  }
+}, { immediate: true })
+
 async function sendContent(content) {
   const text = content.trim()
   if (!text || isSending.value) return
   errorText.value = ''
-  messages.value.push({ role: 'user', content: text })
+  
+  // 添加角色信息到消息中
+  const userMessage =  text
+  messages.value.push({ role: 'user', content: userMessage })
+  
   isSending.value = true
   try {
-    // 优先请求后端返回音频
-    const audioBlob = await chatAudioApi(text)
-    const audioUrl = await playAudioBlob(audioBlob)
+    // 优先请求后端返回音频，携带角色ID
+    const blob = await chatAudioApi(text, props.selectedRole?.id)
+    const audioUrl = await playAudioBlob(blob)
     messages.value.push({ role: 'assistant', content: '语音回复', audioUrl })
   } catch (err) {
     // 回退：若音频失败，尝试文字接口
-    try {
-      const reply = await chatApi(text)
-      messages.value.push({ role: 'assistant', content: reply })
-    } catch (e2) {
-      errorText.value = err?.message || e2?.message || '发送失败'
-    }
+    // try {
+    //   const reply = await chatApi(text)
+    //   messages.value.push({ role: 'assistant', content: reply })
+    // } catch (e2) {
+    //   errorText.value = err?.message || e2?.message || '发送失败'
+    // }
   } finally {
     isSending.value = false
   }
@@ -115,7 +163,14 @@ async function sendMessage() {
 
 <template>
   <div class="chat">
+    <div v-if="props.selectedRole" class="selected-role">
+      <strong>当前角色：</strong>{{ props.selectedRole.name }}
+    </div>
+    
     <div class="messages" ref="list">
+      <div v-if="isLoadingHistory" class="loading-history">
+        正在加载聊天历史...
+      </div>
       <div v-for="(m, idx) in messages" :key="idx" class="message" :class="m.role">
         <div class="bubble">
           <template v-if="m.audioUrl">
@@ -133,7 +188,7 @@ async function sendMessage() {
       <input
         v-model="userInput"
         type="text"
-        placeholder="请输入文本...（也可点击麦克风语音发送）"
+        :placeholder="props.selectedRole ? `与${props.selectedRole.name}对话...（也可点击麦克风语音发送）` : '请输入文本...（也可点击麦克风语音发送）'"
         :disabled="isSending"
       />
       <button
@@ -154,24 +209,24 @@ async function sendMessage() {
 
 <style scoped>
 .chat {
-  max-width: 800px;
-  margin: 0 auto;
-  padding: 16px;
+  height: 100%;
   display: flex;
   flex-direction: column;
-  gap: 12px;
-  max-height: 600px;
+  gap: 8px;
+  padding: 12px;
+  width: 800px;
 }
 .messages {
   display: flex;
   flex-direction: column;
   gap: 8px;
-  min-height: 50vh;
+  flex: 1;
   background: #f7f7f9;
   border: 1px solid #e9e9ef;
   border-radius: 8px;
   padding: 12px;
   overflow-y: auto;
+  min-height: 0;
 }
 .message {
   display: flex;
@@ -227,5 +282,30 @@ async function sendMessage() {
 }
 .error {
   color: #ef4444;
+}
+
+.selected-role {
+  padding: 12px;
+  background: #f0fdf4;
+  border: 1px solid #10b981;
+  border-radius: 8px;
+  margin-bottom: 12px;
+}
+
+.selected-role strong {
+  color: #059669;
+}
+
+.role-info {
+  font-size: 14px;
+  color: #6b7280;
+  margin-top: 4px;
+}
+
+.loading-history {
+  text-align: center;
+  padding: 20px;
+  color: #6b7280;
+  font-style: italic;
 }
 </style>

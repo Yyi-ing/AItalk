@@ -21,6 +21,7 @@ public class aiConfig {
     @Bean
     public ChatClient chatClient(OpenAiChatModel model, ChatMemory chatMemory) {
         return ChatClient.builder(model)
+                .defaultSystem("回复内容中严禁对动作，环境及心理活动进行描写")
 
                 .defaultAdvisors(
                         new SimpleLoggerAdvisor(), // 添加advisor增强环绕通知：日志记录器

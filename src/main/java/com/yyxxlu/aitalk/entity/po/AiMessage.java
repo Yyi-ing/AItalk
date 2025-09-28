@@ -1,4 +1,4 @@
-package com.yyxxlu.aitalk.po;
+package com.yyxxlu.aitalk.entity.po;
 
 import lombok.Data;
 

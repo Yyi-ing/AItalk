@@ -3,7 +3,9 @@ package com.yyxxlu.aitalk.mapper;
 
 
 import org.apache.ibatis.annotations.Mapper;
-import com.yyxxlu.aitalk.po.RoleProfile;
+import com.yyxxlu.aitalk.entity.po.RoleProfile;
+
+import java.util.List;
 
 @Mapper
 public interface RoleProfileMapper {
@@ -14,6 +16,8 @@ public interface RoleProfileMapper {
     int insertSelective(RoleProfile record);
 
     RoleProfile selectByPrimaryKey(String id);
+
+    List<RoleProfile> selectByRoleList();
 
     int updateByPrimaryKeySelective(RoleProfile record);
 

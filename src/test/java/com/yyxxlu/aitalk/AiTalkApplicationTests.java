@@ -1,5 +1,6 @@
 package com.yyxxlu.aitalk;
 
+import com.yyxxlu.aitalk.componet.copyVoice;
 import com.yyxxlu.aitalk.service.VoiceService;
 import org.junit.jupiter.api.Test;
 import org.springframework.ai.chat.client.ChatClient;
@@ -45,6 +46,30 @@ class AiTalkApplicationTests {
 
 
 
+    }
+
+
+    @Test
+    void testRoleAudio() throws IOException {
+        // 保存为MP3文件进行验证
+        ByteBuffer buffer = voiceService.getAudioOptimize("你好","2");
+        byte[] audioData = new byte[buffer.remaining()];
+        buffer.get(audioData);
+
+// 保存到文件
+        Files.write(Paths.get("test.mp3"), audioData);
+
+    }
+
+
+
+    //音色复制测试
+    @Test
+    void testCopyVoice() throws IOException {
+        // 获取音色ID
+        String voiceId = new copyVoice().copy();
+        System.out.println("--------------------------------------");
+        System.out.println(voiceId);
     }
 
 }

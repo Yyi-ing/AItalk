@@ -4,10 +4,12 @@ import com.alibaba.dashscope.audio.ttsv2.SpeechSynthesisParam;
 import com.alibaba.dashscope.audio.ttsv2.SpeechSynthesizer;
 import com.yyxxlu.aitalk.config.PromptConfig;
 import com.yyxxlu.aitalk.mapper.RoleProfileMapper;
-import com.yyxxlu.aitalk.po.RoleProfile;
+import com.yyxxlu.aitalk.entity.po.RoleProfile;
 import com.yyxxlu.aitalk.service.VoiceService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.chat.client.ChatClient;
+import org.springframework.ai.chat.client.advisor.AbstractChatMemoryAdvisor;
+import org.springframework.ai.chat.client.advisor.vectorstore.QuestionAnswerAdvisor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -72,9 +74,70 @@ public class VoiceServiceimpl implements VoiceService {
     }
 
 
-
+    //文本转语音，自定义音色版本，当前版本
     @Override
-    public ByteBuffer getAudioOptimize(String text) {
+    public ByteBuffer getRoleAudio(String text,String voice) {
+        // 模型
+        String model = "cosyvoice-v2";
+        // 音色
+//        String voice = "longcheng";
+
+        // 请求参数
+        SpeechSynthesisParam param =
+                SpeechSynthesisParam.builder()
+                        // 若没有将API Key配置到环境变量中，需将下面这行代码注释放开，并将your-api-key替换为自己的API Key
+                        .apiKey(apiKey)
+                        .model(model) // 模型
+                        .voice(voice) // 音色
+                        .build();
+
+        // 同步模式：禁用回调（第二个参数为null）
+        SpeechSynthesizer synthesizer = new SpeechSynthesizer(param, null);
+        ByteBuffer audio = null;
+        try {
+            // 阻塞直至音频返回
+            audio = synthesizer.call(text);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        } finally {
+            // 任务结束关闭websocket连接
+            synthesizer.getDuplexApi().close(1000, "bye");
+        }
+
+        return audio;
+
+    }
+
+
+
+    //角色优化的文本转语音，目前使用版本
+    @Override
+    public ByteBuffer getAudioOptimize(String text, String id) {
+        //构建角色
+        RoleProfile roleProfile = roleProfileMapper.selectByPrimaryKey(id);
+
+        log.info("角色信息:{}",roleProfile);
+
+        //构建系统prompt
+        String systemPrompt = promptConfig.buildRolePrompt(roleProfile, text);
+        String content = chatClient.prompt()
+                .system(systemPrompt)
+                .user(text)
+                .advisors(a->a.param(AbstractChatMemoryAdvisor.CHAT_MEMORY_CONVERSATION_ID_KEY,id))
+                .call()
+                .content();
+
+        ByteBuffer audio = getRoleAudio(content,roleProfile.getVoiceId());
+
+
+        return audio;
+    }
+
+
+
+    //RAG知识库，尚未完成
+    @Override
+    public ByteBuffer getAudioRag(String text) {
         //构建角色
         RoleProfile roleProfile = roleProfileMapper.selectByPrimaryKey("1");
 
@@ -84,6 +147,7 @@ public class VoiceServiceimpl implements VoiceService {
         String systemPrompt = promptConfig.buildRolePrompt(roleProfile, text);
         String content = chatClient.prompt()
                 .system(systemPrompt)
+                .advisors(new QuestionAnswerAdvisor(null))
                 .user(text)
                 .call()
                 .content();
@@ -100,7 +164,8 @@ public class VoiceServiceimpl implements VoiceService {
 
 
 
-    //测试接口使用
+
+    //测试TTS接口使用
     public void test() {
 
         // 模型

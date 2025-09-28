@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.yyxxlu.aitalk.mapper.RoleProfileMapper">
-  <resultMap id="BaseResultMap" type="com.yyxxlu.aitalk.po.RoleProfile">
+  <resultMap id="BaseResultMap" type="com.yyxxlu.aitalk.entity.po.RoleProfile">
     <id column="id" jdbcType="VARCHAR" property="id" />
     <result column="name" jdbcType="VARCHAR" property="name" />
     <result column="background" jdbcType="VARCHAR" property="background" />
@@ -11,10 +11,11 @@
     <result column="voiceExample" jdbcType="VARCHAR" property="voiceExample" />
     <result column="enableRAG" jdbcType="BOOLEAN" property="enableRAG" />
     <result column="ragCollection" jdbcType="VARCHAR" property="ragCollection" />
+    <result column="voiceId" jdbcType="VARCHAR" property="voiceId" />
   </resultMap>
   <sql id="Base_Column_List">
     id, `name`, background, personality, speakingStyle, knowledgeScope, voiceExample, 
-    enableRAG, ragCollection
+    enableRAG, ragCollection, voiceId
   </sql>
   <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
     select 
@@ -22,19 +23,27 @@
     from roleprofile
     where id = #{id,jdbcType=VARCHAR}
   </select>
+  <select id="selectByRoleList"  resultMap="BaseResultMap">
+    select
+      <include refid="Base_Column_List" />
+    from roleprofile
+  </select>
+
+
+
   <delete id="deleteByPrimaryKey" parameterType="java.lang.String">
     delete from roleprofile
     where id = #{id,jdbcType=VARCHAR}
   </delete>
-  <insert id="insert" keyColumn="id" keyProperty="id" parameterType="com.yyxxlu.aitalk.po.RoleProfile" useGeneratedKeys="true">
+  <insert id="insert" keyColumn="id" keyProperty="id" parameterType="com.yyxxlu.aitalk.entity.po.RoleProfile" useGeneratedKeys="true">
     insert into roleprofile (`name`, background, personality, 
       speakingStyle, knowledgeScope, voiceExample, 
-      enableRAG, ragCollection)
+      enableRAG, ragCollection, voiceId)
     values (#{name,jdbcType=VARCHAR}, #{background,jdbcType=VARCHAR}, #{personality,jdbcType=VARCHAR}, 
       #{speakingstyle,jdbcType=VARCHAR}, #{knowledgescope,jdbcType=VARCHAR}, #{voiceexample,jdbcType=VARCHAR}, 
-      #{enablerag,jdbcType=BOOLEAN}, #{ragcollection,jdbcType=VARCHAR})
+      #{enablerag,jdbcType=BOOLEAN}, #{ragcollection,jdbcType=VARCHAR}, #{voiceid,jdbcType=VARCHAR})
   </insert>
-  <insert id="insertSelective" keyColumn="id" keyProperty="id" parameterType="com.yyxxlu.aitalk.po.RoleProfile" useGeneratedKeys="true">
+  <insert id="insertSelective" keyColumn="id" keyProperty="id" parameterType="com.yyxxlu.aitalk.entity.po.RoleProfile" useGeneratedKeys="true">
     insert into roleprofile
     <trim prefix="(" suffix=")" suffixOverrides=",">
       <if test="name != null">
@@ -60,6 +69,9 @@
       </if>
       <if test="ragcollection != null">
         ragCollection,
+      </if>
+      <if test="voiceid != null">
+        voiceId,
       </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
@@ -87,9 +99,12 @@
       <if test="ragcollection != null">
         #{ragcollection,jdbcType=VARCHAR},
       </if>
+      <if test="voiceid != null">
+        #{voiceid,jdbcType=VARCHAR},
+      </if>
     </trim>
   </insert>
-  <update id="updateByPrimaryKeySelective" parameterType="com.yyxxlu.aitalk.po.RoleProfile">
+  <update id="updateByPrimaryKeySelective" parameterType="com.yyxxlu.aitalk.entity.po.RoleProfile">
     update roleprofile
     <set>
       <if test="name != null">
@@ -116,10 +131,13 @@
       <if test="ragcollection != null">
         ragCollection = #{ragcollection,jdbcType=VARCHAR},
       </if>
+      <if test="voiceid != null">
+        voiceId = #{voiceid,jdbcType=VARCHAR},
+      </if>
     </set>
     where id = #{id,jdbcType=VARCHAR}
   </update>
-  <update id="updateByPrimaryKey" parameterType="com.yyxxlu.aitalk.po.RoleProfile">
+  <update id="updateByPrimaryKey" parameterType="com.yyxxlu.aitalk.entity.po.RoleProfile">
     update roleprofile
     set `name` = #{name,jdbcType=VARCHAR},
       background = #{background,jdbcType=VARCHAR},
@@ -128,7 +146,8 @@
       knowledgeScope = #{knowledgescope,jdbcType=VARCHAR},
       voiceExample = #{voiceexample,jdbcType=VARCHAR},
       enableRAG = #{enablerag,jdbcType=BOOLEAN},
-      ragCollection = #{ragcollection,jdbcType=VARCHAR}
+      ragCollection = #{ragcollection,jdbcType=VARCHAR},
+      voiceId = #{voiceid,jdbcType=VARCHAR}
     where id = #{id,jdbcType=VARCHAR}
   </update>
 </mapper>

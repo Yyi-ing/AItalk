@@ -1,4 +1,4 @@
-package com.yyxxlu.aitalk.po;
+package com.yyxxlu.aitalk.entity.po;
 
 import lombok.Data;
 
@@ -13,5 +13,7 @@ public class RoleProfile {
     private String voiceExample;    // 对话示例
     private boolean enableRAG;      // 是否启用RAG
     private String ragCollection;   // RAG知识库名称
+    private String voiceId;          // 角色音色
+
 }
 
