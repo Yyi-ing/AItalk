@@ -1,8 +1,16 @@
 package com.yyxxlu.aitalk;
 
+import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
+import org.springframework.boot.sql.init.dependency.DependsOnDatabaseInitialization;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.ComponentScans;
+import org.springframework.stereotype.Component;
 
+
+@MapperScan("com.yyxxlu.aitalk.mapper")
 @SpringBootApplication
 public class AiTalkApplication {
 

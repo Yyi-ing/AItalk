@@ -3,9 +3,12 @@ spring:
     name: aiTalk
     version: 1.0.0
   datasource:
-    url: jdbc:mysql://14.103.183.242:3366/qN?useSSL=false&serverTimezone=Asia/Shanghai&characterEncoding=utf8&allowPublicKeyRetrieval=true
-    username: admin
-    password: admin
+#    url: jdbc:mysql://14.103.183.242:3366/qN?useSSL=false&serverTimezone=Asia/Shanghai&characterEncoding=utf8&allowPublicKeyRetrieval=true
+#    username: admin
+#    password: admin
+    url: jdbc:mysql://127.0.0.1:3306/aitalk?useSSL=false&serverTimezone=Asia/Shanghai&characterEncoding=utf8&allowPublicKeyRetrieval=true
+    username: root
+    password: 123456
     driver-class-name: com.mysql.cj.jdbc.Driver
     hikari:
       pool-name: HikariPool
@@ -26,9 +29,23 @@ spring:
           max-wait: -1ms
           max-idle: 8
           min-idle: 0
+  ai:
+    openai:
+      api-key: ${BL_API_KEY}
+      base-url: https://dashscope.aliyuncs.com/compatible-mode
+      chat:
+        options:
+          model: deepseek-v3
+
+
 server:
   port: 8090
 
-ai :
-  key : sk-90e295249b264fbe9e2dfe9d84dc06dd
-  base-url: ""
+ai:
+  apikey: ${BL_API_KEY}
+
+
+logging:
+  level:
+    org.springframework.ai.chat.client.advisor: debug
+    com.yyxxlu.aitalk: debug

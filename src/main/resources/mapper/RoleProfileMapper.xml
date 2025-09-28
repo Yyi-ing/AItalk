@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yyxxlu.aitalk.mapper.RoleProfileMapper">
+  <resultMap id="BaseResultMap" type="com.yyxxlu.aitalk.entity.po.RoleProfile">
+    <id column="id" jdbcType="VARCHAR" property="id" />
+    <result column="name" jdbcType="VARCHAR" property="name" />
+    <result column="background" jdbcType="VARCHAR" property="background" />
+    <result column="personality" jdbcType="VARCHAR" property="personality" />
+    <result column="speakingStyle" jdbcType="VARCHAR" property="speakingStyle" />
+    <result column="knowledgeScope" jdbcType="VARCHAR" property="knowledgeScope" />
+    <result column="voiceExample" jdbcType="VARCHAR" property="voiceExample" />
+    <result column="enableRAG" jdbcType="BOOLEAN" property="enableRAG" />
+    <result column="ragCollection" jdbcType="VARCHAR" property="ragCollection" />
+    <result column="voiceId" jdbcType="VARCHAR" property="voiceId" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    id, `name`, background, personality, speakingStyle, knowledgeScope, voiceExample, 
+    enableRAG, ragCollection, voiceId
+  </sql>
+  <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from roleprofile
+    where id = #{id,jdbcType=VARCHAR}
+  </select>
+  <select id="selectByRoleList"  resultMap="BaseResultMap">
+    select
+      <include refid="Base_Column_List" />
+    from roleprofile
+  </select>
+
+
+
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String">
+    delete from roleprofile
+    where id = #{id,jdbcType=VARCHAR}
+  </delete>
+  <insert id="insert" keyColumn="id" keyProperty="id" parameterType="com.yyxxlu.aitalk.entity.po.RoleProfile" useGeneratedKeys="true">
+    insert into roleprofile (`name`, background, personality, 
+      speakingStyle, knowledgeScope, voiceExample, 
+      enableRAG, ragCollection, voiceId)
+    values (#{name,jdbcType=VARCHAR}, #{background,jdbcType=VARCHAR}, #{personality,jdbcType=VARCHAR}, 
+      #{speakingstyle,jdbcType=VARCHAR}, #{knowledgescope,jdbcType=VARCHAR}, #{voiceexample,jdbcType=VARCHAR}, 
+      #{enablerag,jdbcType=BOOLEAN}, #{ragcollection,jdbcType=VARCHAR}, #{voiceid,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" keyColumn="id" keyProperty="id" parameterType="com.yyxxlu.aitalk.entity.po.RoleProfile" useGeneratedKeys="true">
+    insert into roleprofile
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="name != null">
+        `name`,
+      </if>
+      <if test="background != null">
+        background,
+      </if>
+      <if test="personality != null">
+        personality,
+      </if>
+      <if test="speakingstyle != null">
+        speakingStyle,
+      </if>
+      <if test="knowledgescope != null">
+        knowledgeScope,
+      </if>
+      <if test="voiceexample != null">
+        voiceExample,
+      </if>
+      <if test="enablerag != null">
+        enableRAG,
+      </if>
+      <if test="ragcollection != null">
+        ragCollection,
+      </if>
+      <if test="voiceid != null">
+        voiceId,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="name != null">
+        #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="background != null">
+        #{background,jdbcType=VARCHAR},
+      </if>
+      <if test="personality != null">
+        #{personality,jdbcType=VARCHAR},
+      </if>
+      <if test="speakingstyle != null">
+        #{speakingstyle,jdbcType=VARCHAR},
+      </if>
+      <if test="knowledgescope != null">
+        #{knowledgescope,jdbcType=VARCHAR},
+      </if>
+      <if test="voiceexample != null">
+        #{voiceexample,jdbcType=VARCHAR},
+      </if>
+      <if test="enablerag != null">
+        #{enablerag,jdbcType=BOOLEAN},
+      </if>
+      <if test="ragcollection != null">
+        #{ragcollection,jdbcType=VARCHAR},
+      </if>
+      <if test="voiceid != null">
+        #{voiceid,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.yyxxlu.aitalk.entity.po.RoleProfile">
+    update roleprofile
+    <set>
+      <if test="name != null">
+        `name` = #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="background != null">
+        background = #{background,jdbcType=VARCHAR},
+      </if>
+      <if test="personality != null">
+        personality = #{personality,jdbcType=VARCHAR},
+      </if>
+      <if test="speakingstyle != null">
+        speakingStyle = #{speakingstyle,jdbcType=VARCHAR},
+      </if>
+      <if test="knowledgescope != null">
+        knowledgeScope = #{knowledgescope,jdbcType=VARCHAR},
+      </if>
+      <if test="voiceexample != null">
+        voiceExample = #{voiceexample,jdbcType=VARCHAR},
+      </if>
+      <if test="enablerag != null">
+        enableRAG = #{enablerag,jdbcType=BOOLEAN},
+      </if>
+      <if test="ragcollection != null">
+        ragCollection = #{ragcollection,jdbcType=VARCHAR},
+      </if>
+      <if test="voiceid != null">
+        voiceId = #{voiceid,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.yyxxlu.aitalk.entity.po.RoleProfile">
+    update roleprofile
+    set `name` = #{name,jdbcType=VARCHAR},
+      background = #{background,jdbcType=VARCHAR},
+      personality = #{personality,jdbcType=VARCHAR},
+      speakingStyle = #{speakingstyle,jdbcType=VARCHAR},
+      knowledgeScope = #{knowledgescope,jdbcType=VARCHAR},
+      voiceExample = #{voiceexample,jdbcType=VARCHAR},
+      enableRAG = #{enablerag,jdbcType=BOOLEAN},
+      ragCollection = #{ragcollection,jdbcType=VARCHAR},
+      voiceId = #{voiceid,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=VARCHAR}
+  </update>
+</mapper>
