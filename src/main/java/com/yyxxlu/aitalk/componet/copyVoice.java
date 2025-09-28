@@ -12,7 +12,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class copyVoice{
 
-    private String apiKey="sk-799ecb031b8f4255813d4b092a6e3c4f";
+    private String apiKey;
 
     public String copy() {
 
